@@ -18,6 +18,9 @@ You may not:
 ## Attribution
 Please include a credit line such as:  
 `Assets and code by Jakobie Brown`
+`Sound design by Jakobie Brown`
+`Music by Jakobie Brown`
+`
 
 ## License
 - **All rights reserved** — Contact the author for permissions.
