@@ -13,20 +13,27 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 highest_level = 0
 game_active = False 
 pygame.init() 
+#setting up the screen display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 screen_rect = screen.get_rect()
-
-score_font = pygame.font.SysFont('Aptos', 36, False, False) 
+#setting up the font
+score_font = pygame.font.SysFont('Aptos', 36, False, False)
+# resetting the score to 0 every time to ensure the score doesn't compound
 score = 0 
-score_display = score_font.render(f"Score: {score}", True, "white", None) 
+#printing the score
+score_display = score_font.render(f"Score: {score}", True, "white", None)
+#positioning the score in the top right of the game permanently
 score_display_rect = score_display.get_rect(topright = screen_rect.topright) 
-
+#adding bg_music.mp3, which is located in the sounds folder
 bg_music = pygame.mixer.Sound("sounds/bg_music.mp3") 
 bg_music.set_volume(.5) 
+#adding in-gameover sound to signal the game is over
 gameover_sound = pygame.mixer.Sound("sounds/gameover_sound.mp3") 
 gameover_sound.set_volume(.7)
+#adding in destruction sound effects when you die
 destruction_sound = pygame.mixer.Sound("sounds/destruction.mp3") 
 destruction_sound.set_volume(1)
+#adding in laser sound effects when you shoot
 laser_sound = pygame.mixer.Sound("sounds/laser_sound.mp3") 
 laser_sound.set_volume(.7)
 
@@ -51,6 +58,7 @@ class GameObject(pygame.sprite.Sprite): # create base class for game objects for
     def screen_wrap(self): # screen wrap function, makes sprite appear on other side of screen
         if self.rect.bottom < 0:
             self.rect = self.image.get_rect(midtop = (self.rect.centerx, SCREEN_HEIGHT))
+            #else if, in case the if doesn't work.
         elif self.rect.top > SCREEN_HEIGHT:
             self.rect = self.image.get_rect(midbottom = (self.rect.centerx, 0))
         if self.rect.right < 0:
@@ -58,7 +66,7 @@ class GameObject(pygame.sprite.Sprite): # create base class for game objects for
         elif self.rect.left > SCREEN_WIDTH:
             self.rect = self.image.get_rect(midright = (0, self.rect.y))
 
-class Player(GameObject): 
+class Player(GameObject): #making the player's movement and image and sprites
     def __init__(self):
         super().__init__() 
         self.original_image = pygame.image.load('images/spaceship.png').convert_alpha() 
@@ -72,13 +80,13 @@ class Player(GameObject):
         self.angular_velocity = 0
         self.drag_coefficient = 0.08
 
-    def update(self): 
+    def update(self): #updating for movement and configuring the forces of wind and simulating them too
         self.rotate()
         self.accelerate()
         self.apply_drag()
         self.move()
         self.screen_wrap() # add screen wrap
-    
+    #functions to call for the previous block of code
     def rotate(self):
         self.angle = (self.angle + self.angular_velocity) % 360
         self.image = pygame.transform.rotate(self.original_image, self.angle)
@@ -106,7 +114,7 @@ class Player(GameObject):
         self.image = self.original_image
         self.rect = self.image.get_rect(center = screen_rect.center) 
     
-class Obstacle(GameObject):
+class Obstacle(GameObject): #adding in the obstacles to the game 
     def __init__(self, origin, angle, size = 0, speed = 5, angular_velocity = 5):
         super().__init__()
         self.original_image = pygame.image.load('images/asteroid_16.png').convert_alpha()
@@ -119,7 +127,7 @@ class Obstacle(GameObject):
         self.image_angle = 0 # angle for image rotation
         self.angular_velocity = angular_velocity # image roatation velocity
         self.size = size # size of asteroid
-
+#adding in the movement of the objects
     def update(self):
         self.rotate()
         self.move()
@@ -139,7 +147,7 @@ class Obstacle(GameObject):
         if self.size > 0: self.spawn() # only spawn if size is greater than 0
         self.kill()
 
-    def spawn(self):
+    def spawn(self): #spawn the objects
         global obstacle_group
         theta = randint(0,359) # get random angle in degrees
         for _ in range(int(pow(2,self.size))): # loop 2^self.size times
